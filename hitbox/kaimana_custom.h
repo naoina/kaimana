@@ -101,20 +101,9 @@
 
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
-#define  BOOT_COLOR_DELAY         250    // value in miliseconds
-#define  BOOT_COMPLETE_DELAY      500    // value in miliseconds
-#define  MAIN_LOOP_DELAY           16    // value in miliseconds - used main loop
-#define  IDLE_TIMEOUT_SECONDS      30    // value in seconds - normally 60 or 30 seconds but set very short for testing
-
-
-// definitions of RGB values use by random color generator: setLEDRandomColor(int)
-#define  COLOR_RANDOM_1    127,220,000    // lime green
-#define  COLOR_RANDOM_2    127,000,220    // purple
-#define  COLOR_RANDOM_3    000,220,220    // blue
-#define  COLOR_RANDOM_4    000,255,127    // cyan
-#define  COLOR_RANDOM_5    000,127,255    // cobalt blue
-#define  COLOR_RANDOM_6    255,000,000    // red
-#define  COLOR_RANDOM_7    220,127,000    // orange
-#define  COLOR_RANDOM_8    220,000,127    // magenta
+#define  BOOT_COLOR_DELAY          250    // value in miliseconds
+#define  BOOT_COMPLETE_DELAY      2000    // value in miliseconds
+#define  MAIN_LOOP_DELAY            16    // value in miliseconds - used main loop
+#define  TOURNEY_MODE_ENABLE_TIME 3000    // value in milliseconds
 
 #endif

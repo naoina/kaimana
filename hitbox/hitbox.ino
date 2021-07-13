@@ -33,9 +33,12 @@
 // local function declarations
 int  pollSwitches(void);
 void showStartup(void);
-void setLEDRandomColor(int index);
 // ParadiseArcadeShop.com Kaimana features initialzied when Kaimana class instantiated
 Kaimana kaimana;
+
+bool tourneyMode = false;
+int tourneyButtonHoldTime = 0;
+
 // the setup routine runs first and once each time power is applied to the Kaimana board
 void setup()
 {
@@ -46,16 +49,17 @@ void setup()
 void loop()
 {
   unsigned long  ulTimeout;
-  // initialize timeout value to now + some seconds
-  ulTimeout = millis() + ( (unsigned long)IDLE_TIMEOUT_SECONDS * 1000 );
   // infinite loop of read switches, update LEDs and idle animation when necessary
   while(true)
   {
-    // active -- poll switches and update leds
-    if( pollSwitches() != 0 )
+    if(tourneyMode)
     {
-        // some switches were active so reset idle timeout to now + some seconds
-        ulTimeout = millis() + ( (unsigned long)IDLE_TIMEOUT_SECONDS * 1000 );
+        pollSwitchesForTourneyMode();
+    }
+    else
+    {
+        // active -- poll switches and update leds
+        pollSwitches();
     }
     // delay a little to avoid flickering (yea, updates happens really, really fast!)
     delay( MAIN_LOOP_DELAY );
@@ -70,52 +74,37 @@ void loop()
 //
 void showStartup(void)
 {
-  kaimana.setALL( BLACK );
-  delay( BOOT_COLOR_DELAY );
-  kaimana.setALL( RED );
-  delay( BOOT_COLOR_DELAY );
-  kaimana.setALL( GREEN );
-  delay( BOOT_COLOR_DELAY );
-  kaimana.setALL( BLUE );
-  delay( BOOT_COLOR_DELAY );
-  kaimana.setALL( BLACK );
-  delay( BOOT_COMPLETE_DELAY );
+  kaimana.setALL(BLACK);
+  delay(BOOT_COLOR_DELAY);
+  kaimana.setLED(LED_P1_1, COLOR_LED_P1_1);
+  kaimana.setLED(LED_P1_2, COLOR_LED_P1_2);
+  kaimana.setLED(LED_P2_1, COLOR_LED_P2_1);
+  kaimana.setLED(LED_P2_2, COLOR_LED_P2_2);
+  kaimana.setLED(LED_P3_1, COLOR_LED_P3_1);
+  kaimana.setLED(LED_P3_2, COLOR_LED_P3_2);
+  kaimana.setLED(LED_P4_1, COLOR_LED_P4_1);
+  kaimana.setLED(LED_P4_2, COLOR_LED_P4_2);
+  kaimana.setLED(LED_K1_1, COLOR_LED_K1_1);
+  kaimana.setLED(LED_K1_2, COLOR_LED_K1_2);
+  kaimana.setLED(LED_K2_1, COLOR_LED_K2_1);
+  kaimana.setLED(LED_K2_2, COLOR_LED_K2_2);
+  kaimana.setLED(LED_K3_1, COLOR_LED_K3_1);
+  kaimana.setLED(LED_K3_2, COLOR_LED_K3_2);
+  kaimana.setLED(LED_K4_1, COLOR_LED_K4_1);
+  kaimana.setLED(LED_K4_2, COLOR_LED_K4_2);
+  kaimana.setLED(LED_LEFT_1, COLOR_LED_LEFT_1);
+  kaimana.setLED(LED_LEFT_2, COLOR_LED_LEFT_2);
+  kaimana.setLED(LED_DOWN_1, COLOR_LED_DOWN_1);
+  kaimana.setLED(LED_DOWN_2, COLOR_LED_DOWN_2);
+  kaimana.setLED(LED_RIGHT_1, COLOR_LED_RIGHT_1);
+  kaimana.setLED(LED_RIGHT_2, COLOR_LED_RIGHT_2);
+  kaimana.setLED(LED_UP_1, COLOR_LED_UP_1);
+  kaimana.setLED(LED_UP_2, COLOR_LED_UP_2);
+  kaimana.updateALL();
+  delay(BOOT_COMPLETE_DELAY);
+  kaimana.setALL(BLACK);
 }
-// set LED to one of 8 predefined colors selected at random
-//
-void setLEDRandomColor(int index)
-{
-  switch(random(1,8))    // pick a random color between 1 and 8
-  {
-    case 1:
-      kaimana.setLED(index, COLOR_RANDOM_1);
-      break;
-    case 2:
-      kaimana.setLED(index, COLOR_RANDOM_2);
-      break;
-    case 3:
-      kaimana.setLED(index, COLOR_RANDOM_3);
-      break;
-    case 4:
-      kaimana.setLED(index, COLOR_RANDOM_4);
-      break;
-    case 5:
-      kaimana.setLED(index, COLOR_RANDOM_5);
-      break;
-    case 6:
-      kaimana.setLED(index, COLOR_RANDOM_6);
-      break;
-    case 7:
-      kaimana.setLED(index, COLOR_RANDOM_7);
-      break;
-    case 8:
-      kaimana.setLED(index, COLOR_RANDOM_8);
-      break;
-    default:   // any undefined value so discard data and set led to BLACK
-      kaimana.setLED(index, BLACK);
-      break;
-  }
-}
+
 int pollSwitches(void)
 {
   static int  iLED[LED_COUNT];
@@ -424,6 +413,24 @@ int pollSwitches(void)
       iLED[LED_K4_1] = false;
       iLED[LED_K4_2] = false;
   }
+  if(!digitalRead(PIN_START))
+  {
+    tourneyButtonHoldTime += MAIN_LOOP_DELAY;
+    // Do animations a once when moves to Tourney mode.
+    if(tourneyButtonHoldTime >= TOURNEY_MODE_ENABLE_TIME && tourneyButtonHoldTime <= TOURNEY_MODE_ENABLE_TIME + MAIN_LOOP_DELAY)
+    {
+      showStartup();
+    }
+  }
+  else
+  {
+    if(tourneyButtonHoldTime >= TOURNEY_MODE_ENABLE_TIME)
+    {
+      tourneyMode = true;
+    }
+    tourneyButtonHoldTime = 0;
+  }
+
   // zero active switch counter (note: 4 way joystick counts as 1)
   iActiveSwitchCount = 0;
   // set LED color based on switch
@@ -436,4 +443,26 @@ int pollSwitches(void)
   kaimana.updateALL();
   // return number of active switches
   return(iActiveSwitchCount);
+}
+
+void pollSwitchesForTourneyMode(void)
+{
+  if(!digitalRead(PIN_START))
+  {
+    tourneyButtonHoldTime += MAIN_LOOP_DELAY;
+    // Do animations a once when moves to non-tourney mode.
+    if(tourneyButtonHoldTime >= TOURNEY_MODE_ENABLE_TIME && tourneyButtonHoldTime <= TOURNEY_MODE_ENABLE_TIME + MAIN_LOOP_DELAY)
+    {
+      showStartup();
+      kaimana.updateALL();
+    }
+  }
+  else
+  {
+    if(tourneyButtonHoldTime >= TOURNEY_MODE_ENABLE_TIME)
+    {
+        tourneyMode = false;
+    }
+    tourneyButtonHoldTime = 0;
+  }
 }
