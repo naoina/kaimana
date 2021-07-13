@@ -36,14 +36,13 @@ void showStartup(void);
 // ParadiseArcadeShop.com Kaimana features initialzied when Kaimana class instantiated
 Kaimana kaimana;
 
-bool tourneyMode = false;
+bool tourneyMode = true;
 int tourneyButtonHoldTime = 0;
 
 // the setup routine runs first and once each time power is applied to the Kaimana board
 void setup()
 {
-  // light up all leds at boot to demonstrate everything is functional
-  showStartup();
+  // do nothing.
 }
 // the loop routine repeats indefinitely and executes immediately following the setup() function
 void loop()
