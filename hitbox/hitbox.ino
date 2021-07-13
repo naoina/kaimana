@@ -30,7 +30,6 @@
 #include <util/delay.h>
 #include "kaimana.h"
 #include "kaimana_custom.h"
-#include "animations.h"
 // local function declarations
 int  pollSwitches(void);
 void showStartup(void);
@@ -57,14 +56,6 @@ void loop()
     {
         // some switches were active so reset idle timeout to now + some seconds
         ulTimeout = millis() + ( (unsigned long)IDLE_TIMEOUT_SECONDS * 1000 );
-    }
-    else
-    {
-        // no switches active so test for start of idle timeout
-        if( millis() > ulTimeout )
-        {
-          animation_idle();
-        }
     }
     // delay a little to avoid flickering (yea, updates happens really, really fast!)
     delay( MAIN_LOOP_DELAY );
@@ -447,45 +438,6 @@ int pollSwitches(void)
   }
   // convert joystick, P1-P4, K1-K4 into a single unsigned int
   switchActivity = joystickDirection + switchActivity;
-  kaimana.switchHistorySet(switchActivity);
-  // test for combinations from most complext to least complex
-  // test for switches in reverse order (newest to oldest)
-  // combo #6
-  // test for: Ultra 2 (Metsu Shoryuken)
-  // combo is: DOWN, DOWN+RIGHT, RIGHT, DOWN, DOWN+RIGHT, RIGHT, RIGHT+K3
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_6A ) )
-      animation_combo_6();
-  // combo #5
-  // test for: Ultra 1 (Metsu Hadouken)
-  // combo is: DOWN, DOWN+RIGHT, RIGHT, <NONE>, DOWN, DOWN+RIGHT, RIGHT, RIGHT+P3
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_5A ) )
-      animation_combo_5();
-  // combo #4
-  // test for: Super (Shinkuu Hadouken)
-  // combo is: DOWN, DOWN+RIGHT, RIGHT, <NONE>, DOWN, DOWN+RIGHT, RIGHT, RIGHT+P1
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_4A ) )
-      animation_combo_4();
-  // combo #3
-  // test for: Tatsumaki Senpukyaku (Hurricane Kick)
-  // combo is: DOWN, DOWN+LEFT, LEFT, LEFT+K1 or LEFT+K2
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_3A ) )
-      animation_combo_3();
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_3B ) )
-      animation_combo_3();
-  // combo #2
-  // test for: Ryu Shoryuken (Dragon Punch)
-  // combo is: RIGHT, <NONE>, DOWN, DOWN+RIGHT, DOWN+RIGHT+P1 or DOWN+RIGHT+P2
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_2A ) )
-      animation_combo_2();
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_2B ) )
-      animation_combo_2();
-  // combo #1
-  // test for: Ryu Hadouken (Fireball)
-  // combo is: DOWN, DOWN+RIGHT, RIGHT, RIGHT+P1 or RIGHT+P2
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_1A ) )
-      animation_combo_1();
-  if( kaimana.switchHistoryTest( COMBO_PATTERN_1B ) )
-      animation_combo_1();
   // zero active switch counter (note: 4 way joystick counts as 1)
   iActiveSwitchCount = 0;
   // set LED color based on switch
