@@ -134,310 +134,296 @@ int pollSwitches(void)
       firsttime = 0;
     }
   }
-  // read arduino pins and save results in the mapped LED if button is pressed (pin grounded)
-  // complex special case for joystick but it's worth the effort
-  joystickDirection = ATTACK_NONE;
-  if(!digitalRead(PIN_RIGHT))
-    joystickDirection |= ATTACK_RIGHT;
-  if(!digitalRead(PIN_LEFT))
-    joystickDirection |= ATTACK_LEFT;
-  if(!digitalRead(PIN_DOWN))
-    joystickDirection |= ATTACK_DOWN;
-  if(!digitalRead(PIN_UP))
-    joystickDirection |= ATTACK_UP;
-  switch(joystickDirection)
-  {
-    case ATTACK_RIGHT:    // right
-      kaimana.setLED(LED_JOY, 127, 220, 000);
-      iLED[LED_JOY] = true;
-      break;
-    case ATTACK_LEFT:    // left
-      kaimana.setLED(LED_JOY, 127, 000, 220);
-      iLED[LED_JOY] = true;
-      break;
-    case ATTACK_DOWN:    // down
-      kaimana.setLED(LED_JOY, 000, 220, 220);
-      iLED[LED_JOY] = true;
-      break;
-    case ATTACK_DOWN + ATTACK_RIGHT:    // down + right
-      kaimana.setLED(LED_JOY, 000, 255, 127);
-      iLED[LED_JOY] = true;
-      break;
-    case ATTACK_DOWN + ATTACK_LEFT:    // down + left
-      kaimana.setLED(LED_JOY, 000, 127, 255);
-      iLED[LED_JOY] = true;
-      break;
-    case ATTACK_UP:    // up
-      kaimana.setLED(LED_JOY, 255, 000, 000);
-      iLED[LED_JOY] = true;
-      break;
-    case ATTACK_UP + ATTACK_RIGHT:    // up + right
-      kaimana.setLED(LED_JOY, 220, 127, 000);
-      iLED[LED_JOY] = true;
-      break;
-    case ATTACK_UP + ATTACK_LEFT:   // up + left
-      kaimana.setLED(LED_JOY, 220, 000, 127);
-      iLED[LED_JOY] = true;
-      break;
-    default:   // zero or any undefined value on an 8 way stick like UP+DOWN which is not happening on my watch
-      kaimana.setLED(LED_JOY, BLACK);
-      iLED[LED_JOY] = false;
-      break;
-  }
   // clear results for switch activity
   switchActivity = ATTACK_NONE;
-  // test switch and set LED based on result       // HOME = GUIDE
-  if(!digitalRead(PIN_HOME))
+  if(!digitalRead(PIN_RIGHT))
   {
-    // switch is active
-    if(iLED[LED_HOME] == true)
+    if(!iLED[LED_RIGHT_1])
     {
-      //maintain color while switch is active
-      iLED[LED_HOME] = true;
+        kaimana.setLED(LED_RIGHT_1, COLOR_LED_RIGHT_1);
+        iLED[LED_RIGHT_1] = true;
     }
-    else
+    if(!iLED[LED_RIGHT_2])
     {
-      // select new color when switch is first activated
-      setLEDRandomColor(LED_HOME);
-      iLED[LED_HOME] = true;
+        kaimana.setLED(LED_RIGHT_2, COLOR_LED_RIGHT_2);
+        iLED[LED_RIGHT_2] = true;
     }
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_HOME, BLACK);
-      iLED[LED_HOME] = false;
+    kaimana.setLED(LED_RIGHT_1, BLACK);
+    kaimana.setLED(LED_RIGHT_2, BLACK);
+    iLED[LED_RIGHT_1] = false;
+    iLED[LED_RIGHT_2] = false;
   }
-  // test switch and set LED based on result    // SELECT = BACK
-  if(!digitalRead(PIN_SELECT))
+  if(!digitalRead(PIN_DOWN))
   {
-    // switch is active
-    if(iLED[LED_SELECT] == true)
+    if(!iLED[LED_DOWN_1])
     {
-      //maintain color while switch is active
-      iLED[LED_SELECT] = true;
+        kaimana.setLED(LED_DOWN_1, COLOR_LED_DOWN_1);
+        iLED[LED_DOWN_1] = true;
     }
-    else
+    if(!iLED[LED_DOWN_2])
     {
-      // select new color when switch is first activated
-      setLEDRandomColor(LED_SELECT);
-      iLED[LED_SELECT] = true;
+        kaimana.setLED(LED_DOWN_2, COLOR_LED_DOWN_2);
+        iLED[LED_DOWN_2] = true;
     }
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_SELECT, BLACK);
-      iLED[LED_SELECT] = false;
+    kaimana.setLED(LED_DOWN_1, BLACK);
+    kaimana.setLED(LED_DOWN_2, BLACK);
+    iLED[LED_DOWN_1] = false;
+    iLED[LED_DOWN_2] = false;
   }
-  // test switch and set LED based on result
-  if(!digitalRead(PIN_START))
+  if(!digitalRead(PIN_LEFT))
   {
-    // switch is active
-    if(iLED[LED_START] == true)
+    if(!iLED[LED_LEFT_1])
     {
-      //maintain color while switch is active
-      iLED[LED_START] = true;
+        kaimana.setLED(LED_LEFT_1, COLOR_LED_LEFT_1);
+        iLED[LED_LEFT_1] = true;
     }
-    else
+    if(!iLED[LED_LEFT_2])
     {
-      // select new color when switch is first activated
-      setLEDRandomColor(LED_START);
-      iLED[LED_START] = true;
+        kaimana.setLED(LED_LEFT_2, COLOR_LED_LEFT_2);
+        iLED[LED_LEFT_2] = true;
     }
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_START, BLACK);
-      iLED[LED_START] = false;
+    kaimana.setLED(LED_LEFT_1, BLACK);
+    kaimana.setLED(LED_LEFT_2, BLACK);
+    iLED[LED_LEFT_1] = false;
+    iLED[LED_LEFT_2] = false;
+  }
+  if(!digitalRead(PIN_UP))
+  {
+    if(!iLED[LED_UP_1])
+    {
+        kaimana.setLED(LED_UP_1, COLOR_LED_UP_1);
+        iLED[LED_UP_1] = true;
+    }
+    if(!iLED[LED_UP_2])
+    {
+        kaimana.setLED(LED_UP_2, COLOR_LED_UP_2);
+        iLED[LED_UP_2] = true;
+    }
+  }
+  else
+  {
+    kaimana.setLED(LED_UP_1, BLACK);
+    kaimana.setLED(LED_UP_2, BLACK);
+    iLED[LED_UP_1] = false;
+    iLED[LED_UP_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_P1))
   {
     switchActivity |= ATTACK_P1;
     // switch is active
-    if(iLED[LED_P1] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_P1] = true;
-    }
-    else
+    if(!iLED[LED_P1_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_P1);
-      iLED[LED_P1] = true;
+      kaimana.setLED(LED_P1_1, COLOR_LED_P1_1);
+      iLED[LED_P1_1] = true;
+    }
+    if(!iLED[LED_P1_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_P1_2, COLOR_LED_P1_2);
+      iLED[LED_P1_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_P1, BLACK);
-      iLED[LED_P1] = false;
+      kaimana.setLED(LED_P1_1, BLACK);
+      kaimana.setLED(LED_P1_2, BLACK);
+      iLED[LED_P1_1] = false;
+      iLED[LED_P1_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_P2))
   {
     switchActivity |= ATTACK_P2;
     // switch is active
-    if(iLED[LED_P2] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_P2] = true;
-    }
-    else
+    if(!iLED[LED_P2_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_P2);
-      iLED[LED_P2] = true;
+      kaimana.setLED(LED_P2_1, COLOR_LED_P2_1);
+      iLED[LED_P2_1] = true;
+    }
+    if(!iLED[LED_P2_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_P2_2, COLOR_LED_P2_2);
+      iLED[LED_P2_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_P2, BLACK);
-      iLED[LED_P2] = false;
+      kaimana.setLED(LED_P2_1, BLACK);
+      kaimana.setLED(LED_P2_2, BLACK);
+      iLED[LED_P2_1] = false;
+      iLED[LED_P2_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_P3))
   {
     switchActivity |= ATTACK_P3;
     // switch is active
-    if(iLED[LED_P3] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_P3] = true;
-    }
-    else
+    if(!iLED[LED_P3_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_P3);
-      iLED[LED_P3] = true;
+      kaimana.setLED(LED_P3_1, COLOR_LED_P3_1);
+      iLED[LED_P3_1] = true;
+    }
+    if(!iLED[LED_P3_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_P3_2, COLOR_LED_P3_2);
+      iLED[LED_P3_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_P3, BLACK);
-      iLED[LED_P3] = false;
+      kaimana.setLED(LED_P3_1, BLACK);
+      kaimana.setLED(LED_P3_2, BLACK);
+      iLED[LED_P3_1] = false;
+      iLED[LED_P3_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_P4))
   {
     switchActivity |= ATTACK_P4;
     // switch is active
-    if(iLED[LED_P4] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_P4] = true;
-    }
-    else
+    if(!iLED[LED_P4_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_P4);
-      iLED[LED_P4] = true;
+      kaimana.setLED(LED_P4_1, COLOR_LED_P4_1);
+      iLED[LED_P4_1] = true;
+    }
+    if(!iLED[LED_P4_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_P4_2, COLOR_LED_P4_2);
+      iLED[LED_P4_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_P4, BLACK);
-      iLED[LED_P4] = false;
+      kaimana.setLED(LED_P4_1, BLACK);
+      kaimana.setLED(LED_P4_2, BLACK);
+      iLED[LED_P4_1] = false;
+      iLED[LED_P4_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_K1))
   {
     switchActivity |= ATTACK_K1;
     // switch is active
-    if(iLED[LED_K1] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_K1] = true;
-    }
-    else
+    if(!iLED[LED_K1_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_K1);
-      iLED[LED_K1] = true;
+      kaimana.setLED(LED_K1_1, COLOR_LED_K1_1);
+      iLED[LED_K1_1] = true;
+    }
+    if(!iLED[LED_K1_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_K1_2, COLOR_LED_K1_2);
+      iLED[LED_K1_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_K1, BLACK);
-      iLED[LED_K1] = false;
+      kaimana.setLED(LED_K1_1, BLACK);
+      kaimana.setLED(LED_K1_2, BLACK);
+      iLED[LED_K1_1] = false;
+      iLED[LED_K1_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_K2))
   {
     switchActivity |= ATTACK_K2;
     // switch is active
-    if(iLED[LED_K2] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_K2] = true;
-    }
-    else
+    if(!iLED[LED_K2_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_K2);
-      iLED[LED_K2] = true;
+      kaimana.setLED(LED_K2_1, COLOR_LED_K2_1);
+      iLED[LED_K2_1] = true;
+    }
+    if(!iLED[LED_K2_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_K2_2, COLOR_LED_K2_2);
+      iLED[LED_K2_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_K2, BLACK);
-      iLED[LED_K2] = false;
+      kaimana.setLED(LED_K2_1, BLACK);
+      kaimana.setLED(LED_K2_2, BLACK);
+      iLED[LED_K2_1] = false;
+      iLED[LED_K2_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_K3))
   {
     switchActivity |= ATTACK_K3;
     // switch is active
-    if(iLED[LED_K3] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_K3] = true;
-    }
-    else
+    if(!iLED[LED_K3_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_K3);
-      iLED[LED_K3] = true;
+      kaimana.setLED(LED_K3_1, COLOR_LED_K3_1);
+      iLED[LED_K3_1] = true;
+    }
+    if(!iLED[LED_K3_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_K3_2, COLOR_LED_K3_2);
+      iLED[LED_K3_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_K3, BLACK);
-      iLED[LED_K3] = false;
+      kaimana.setLED(LED_K3_1, BLACK);
+      kaimana.setLED(LED_K3_2, BLACK);
+      iLED[LED_K3_1] = false;
+      iLED[LED_K3_2] = false;
   }
   // test switch and set LED based on result
   if(!digitalRead(PIN_K4))
   {
     switchActivity |= ATTACK_K4;
     // switch is active
-    if(iLED[LED_K4] == true)
-    {
-      //maintain color while switch is active
-      iLED[LED_K4] = true;
-    }
-    else
+    if(!iLED[LED_K4_1])
     {
       // select new color when switch is first activated
-      setLEDRandomColor(LED_K4);
-      iLED[LED_K4] = true;
+      kaimana.setLED(LED_K4_1, COLOR_LED_K4_1);
+      iLED[LED_K4_1] = true;
+    }
+    if(!iLED[LED_K4_2])
+    {
+      // select new color when switch is first activated
+      kaimana.setLED(LED_K4_2, COLOR_LED_K4_2);
+      iLED[LED_K4_2] = true;
     }
   }
   else
   {
       // switch is inactive
-      kaimana.setLED(LED_K4, BLACK);
-      iLED[LED_K4] = false;
+      kaimana.setLED(LED_K4_1, BLACK);
+      kaimana.setLED(LED_K4_2, BLACK);
+      iLED[LED_K4_1] = false;
+      iLED[LED_K4_2] = false;
   }
-  // convert joystick, P1-P4, K1-K4 into a single unsigned int
-  switchActivity = joystickDirection + switchActivity;
   // zero active switch counter (note: 4 way joystick counts as 1)
   iActiveSwitchCount = 0;
   // set LED color based on switch

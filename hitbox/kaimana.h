@@ -93,7 +93,7 @@
 #define  PURPLE   255,000,255
 #define  CYAN     000,255,255
 #define  WHITE    255,255,255
-
+#define  PINK     166,15,36
 
 // RGB value structure.
 typedef struct __attribute__ ((__packed__)) {

@@ -34,72 +34,76 @@
 #include "Arduino.h"
 #include "kaimana.h"
 
-
-// uncomment exactly one of the _LED_ORDER_*_ choices below or make your own 
-// based on the order you have your LEDs connected to the Kaimana board
-//
-#define  _LED_ORDER_DEFAULT_  true
-//#define  _LED_ORDER_JWYDER_   true
-
-
-#ifdef _LED_ORDER_DEFAULT_
-  // Map function names to default LED index numbers
-  // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
-  // change or expand as needed
-  //
-  //   KAIMANA->LED_JOY->LED_HOME->LED_SELECT->LED_START->LED_P1->LED-P2->LED_P3->LED-P4->LED_K1->LED-K2->LED_K3->LED-K4
-  //
-  #define  LED_JOY     0
-  #define  LED_HOME    1
-  #define  LED_GUIDE   1
-  #define  LED_SELECT  2
-  #define  LED_BACK    2
-  #define  LED_START   3
-  #define  LED_P1      4
-  #define  LED_P2      5
-  #define  LED_P3      6
-  #define  LED_P4      7
-  #define  LED_K1      8
-  #define  LED_K2      9
-  #define  LED_K3      10
-  #define  LED_K4      11
-#endif
-
-
-#ifdef _LED_ORDER_JWYDER_
-  // Map function names to LED index numbers 
-  // example for just K4-K1 and P1-P4 are connected first to the Kaimana board
-  // submitted by jwyder
-  //
-  //   KAIMANA->LED-K4->LED_K3->LED_K2->LED_K1->LED-P1->LED_P2->LED-P3->LED_P4->LED_JOY->LED_HOME->LED_SELECT->LED_START
-  //
-  #define  LED_K4      0
-  #define  LED_K3      1
-  #define  LED_K2      2
-  #define  LED_K1      3
-  #define  LED_P1      4
-  #define  LED_P2      5
-  #define  LED_P3      6
-  #define  LED_P4      7
-  #define  LED_JOY     8
-  #define  LED_HOME    9
-  #define  LED_GUIDE   9
-  #define  LED_SELECT  10
-  #define  LED_BACK    10
-  #define  LED_START   11
-#endif
-
+// Kaimana J2 RGB LED has 2 LEDs.
+#define  LED_P1_1      16
+#define  LED_P2_1      14
+#define  LED_P3_1      12
+#define  LED_P4_1      10
+#define  LED_K1_1      2
+#define  LED_K2_1      4
+#define  LED_K3_1      6
+#define  LED_K4_1      8
+#define  LED_LEFT_1    22
+#define  LED_DOWN_1    20
+#define  LED_RIGHT_1   18
+#define  LED_UP_1      0
+#define  LED_HOME_1    24
+#define  LED_GUIDE_1   26
+#define  LED_SELECT_1  28
+#define  LED_BACK_1    30
+#define  LED_START_1   32
+#define  LED_P1_2      (LED_P1_1 + 1)
+#define  LED_P2_2      (LED_P2_1 + 1)
+#define  LED_P3_2      (LED_P3_1 + 1)
+#define  LED_P4_2      (LED_P4_1 + 1)
+#define  LED_K1_2      (LED_K1_1 + 1)
+#define  LED_K2_2      (LED_K2_1 + 1)
+#define  LED_K3_2      (LED_K3_1 + 1)
+#define  LED_K4_2      (LED_K4_1 + 1)
+#define  LED_LEFT_2    (LED_LEFT_1 + 1)
+#define  LED_DOWN_2    (LED_DOWN_1 + 1)
+#define  LED_RIGHT_2   (LED_RIGHT_1 + 1)
+#define  LED_UP_2      (LED_UP_1 + 1)
+#define  LED_HOME_2    (LED_HOME_1 + 1)
+#define  LED_GUIDE_2   (LED_GUIDE_1 + 1)
+#define  LED_SELECT_2  (LED_SELECT_1 + 1)
+#define  LED_BACK_2    (LED_BACK_1 + 1)
+#define  LED_START_2   (LED_START_1 + 1)
 
 // maximum number of LEDs attached to Kaimana board
 // best to leave value untouched at 12 unless you understand why
-#define  LED_COUNT   12
+#define  LED_COUNT   24
 
+#define  COLOR_LED_P1_1      PURPLE
+#define  COLOR_LED_P1_2      PURPLE
+#define  COLOR_LED_P2_1      PURPLE
+#define  COLOR_LED_P2_2      PURPLE
+#define  COLOR_LED_P3_1      PURPLE
+#define  COLOR_LED_P3_2      PURPLE
+#define  COLOR_LED_P4_1      PURPLE
+#define  COLOR_LED_P4_2      PURPLE
+#define  COLOR_LED_K1_1      PURPLE
+#define  COLOR_LED_K1_2      PURPLE
+#define  COLOR_LED_K2_1      PURPLE
+#define  COLOR_LED_K2_2      PURPLE
+#define  COLOR_LED_K3_1      PURPLE
+#define  COLOR_LED_K3_2      PURPLE
+#define  COLOR_LED_K4_1      PURPLE
+#define  COLOR_LED_K4_2      PURPLE
+#define  COLOR_LED_LEFT_1    WHITE
+#define  COLOR_LED_LEFT_2    WHITE
+#define  COLOR_LED_DOWN_1    WHITE
+#define  COLOR_LED_DOWN_2    WHITE
+#define  COLOR_LED_RIGHT_1   WHITE
+#define  COLOR_LED_RIGHT_2   WHITE
+#define  COLOR_LED_UP_1      PINK
+#define  COLOR_LED_UP_2      PINK
 
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
 #define  BOOT_COLOR_DELAY         250    // value in miliseconds
 #define  BOOT_COMPLETE_DELAY      500    // value in miliseconds
-#define  MAIN_LOOP_DELAY           50    // value in miliseconds - used main loop
+#define  MAIN_LOOP_DELAY           16    // value in miliseconds - used main loop
 #define  IDLE_TIMEOUT_SECONDS      30    // value in seconds - normally 60 or 30 seconds but set very short for testing
 
 
