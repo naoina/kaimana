@@ -93,6 +93,7 @@
 #define  PURPLE   255,000,255
 #define  CYAN     000,255,255
 #define  WHITE    255,255,255
+#define  DARK_WHITE 16,16,16
 #define  PINK     166,15,36
 
 // RGB value structure.

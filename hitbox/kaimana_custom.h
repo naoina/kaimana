@@ -74,30 +74,30 @@
 // best to leave value untouched at 12 unless you understand why
 #define  LED_COUNT   24
 
-#define  COLOR_LED_P1_1      PURPLE
-#define  COLOR_LED_P1_2      PURPLE
-#define  COLOR_LED_P2_1      PURPLE
-#define  COLOR_LED_P2_2      PURPLE
-#define  COLOR_LED_P3_1      PURPLE
-#define  COLOR_LED_P3_2      PURPLE
-#define  COLOR_LED_P4_1      PURPLE
-#define  COLOR_LED_P4_2      PURPLE
-#define  COLOR_LED_K1_1      PURPLE
-#define  COLOR_LED_K1_2      PURPLE
-#define  COLOR_LED_K2_1      PURPLE
-#define  COLOR_LED_K2_2      PURPLE
-#define  COLOR_LED_K3_1      PURPLE
-#define  COLOR_LED_K3_2      PURPLE
-#define  COLOR_LED_K4_1      PURPLE
-#define  COLOR_LED_K4_2      PURPLE
-#define  COLOR_LED_LEFT_1    WHITE
-#define  COLOR_LED_LEFT_2    WHITE
-#define  COLOR_LED_DOWN_1    WHITE
-#define  COLOR_LED_DOWN_2    WHITE
-#define  COLOR_LED_RIGHT_1   WHITE
-#define  COLOR_LED_RIGHT_2   WHITE
-#define  COLOR_LED_UP_1      PINK
-#define  COLOR_LED_UP_2      PINK
+#define  COLOR_LED_P1_1      WHITE
+#define  COLOR_LED_P1_2      WHITE
+#define  COLOR_LED_P2_1      WHITE
+#define  COLOR_LED_P2_2      WHITE
+#define  COLOR_LED_P3_1      WHITE
+#define  COLOR_LED_P3_2      WHITE
+#define  COLOR_LED_P4_1      WHITE
+#define  COLOR_LED_P4_2      WHITE
+#define  COLOR_LED_K1_1      WHITE
+#define  COLOR_LED_K1_2      WHITE
+#define  COLOR_LED_K2_1      WHITE
+#define  COLOR_LED_K2_2      WHITE
+#define  COLOR_LED_K3_1      WHITE
+#define  COLOR_LED_K3_2      WHITE
+#define  COLOR_LED_K4_1      WHITE
+#define  COLOR_LED_K4_2      WHITE
+#define  COLOR_LED_LEFT_1    DARK_WHITE
+#define  COLOR_LED_LEFT_2    DARK_WHITE
+#define  COLOR_LED_DOWN_1    DARK_WHITE
+#define  COLOR_LED_DOWN_2    DARK_WHITE
+#define  COLOR_LED_RIGHT_1   DARK_WHITE
+#define  COLOR_LED_RIGHT_2   DARK_WHITE
+#define  COLOR_LED_UP_1      DARK_WHITE
+#define  COLOR_LED_UP_2      DARK_WHITE
 
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
