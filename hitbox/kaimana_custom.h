@@ -74,6 +74,19 @@
 // best to leave value untouched at 12 unless you understand why
 #define  LED_COUNT   24
 
+// basic color definitions with various R,G,B values
+// generic (may  want to prefix with COLOR_* to localize further)
+#define  BLACK      000,000,000
+#define  RED        255,000,000
+#define  GREEN      000,255,000
+#define  YELLOW     255,255,000
+#define  BLUE       000,000,255
+#define  PURPLE     255,000,255
+#define  CYAN       000,255,255
+#define  WHITE      255,255,255
+#define  DARK_WHITE 16,16,16
+#define  PINK       166,15,36
+
 #define  COLOR_LED_P1_1      WHITE
 #define  COLOR_LED_P1_2      WHITE
 #define  COLOR_LED_P2_1      WHITE
