@@ -47,7 +47,6 @@ void setup()
 // the loop routine repeats indefinitely and executes immediately following the setup() function
 void loop()
 {
-  unsigned long  ulTimeout;
   // infinite loop of read switches, update LEDs and idle animation when necessary
   while(true)
   {
