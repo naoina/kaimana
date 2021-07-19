@@ -32,7 +32,6 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include "Arduino.h"
-#include "kaimana.h"
 
 // Kaimana J2 RGB LED has 2 LEDs.
 #define  LED_P1_1      16

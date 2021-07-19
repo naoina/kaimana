@@ -28,7 +28,7 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <util/delay.h>
-#include "kaimana.h"
+#include "kaimana.hpp"
 #include "kaimana_custom.h"
 // local function declarations
 int  pollSwitches(void);
