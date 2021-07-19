@@ -117,5 +117,6 @@
 #define  BOOT_COMPLETE_DELAY      2000    // value in miliseconds
 #define  MAIN_LOOP_DELAY            16    // value in miliseconds - used main loop
 #define  TOURNEY_MODE_ENABLE_TIME 3000    // value in milliseconds
+#define  SETTING_MODE_ENABLE_TIME 3000    // value in milliseconds
 
 #endif

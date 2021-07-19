@@ -28,6 +28,7 @@
 #define __PROG_TYPES_COMPAT__
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <EEPROM.h>
 #include "Arduino.h"
 #include "kaimana_custom.h"
 
@@ -100,7 +101,18 @@ class Kaimana
     // declare RGB array for 15 buttons --> 12 LEDs
     // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
     RGB_t    _led[LED_COUNT];
+    RGB_t    _color[LED_COUNT];
     uint16_t _switchHistory[SWITCH_HISTORY_MAX];
+
+    constexpr bool isValidIndex(int index)
+    {
+      return index >= 0 && index < LED_COUNT;
+    }
+
+    constexpr int getEEPROMAddress(int index)
+    {
+      return index * sizeof(RGB_t);
+    }
 
   public:
     Kaimana(void)
@@ -131,14 +143,32 @@ class Kaimana
       pinMode( PIN_K3,     INPUT_PULLUP );
       pinMode( PIN_K4,     INPUT_PULLUP );
 
+      for(auto i = 0; i < LED_COUNT; i++)
+      {
+          EEPROM.get(getEEPROMAddress(i), _color[i]);
+      }
+
       // initialize Switch History
       switchHistoryClear();
+    }
+
+    RGB_t getLED(int index)
+    {
+      return _led[index];
+    }
+
+    void setLED(int index)
+    {
+      if(isValidIndex(index))
+      {
+        _led[index] = _color[index];
+      }
     }
 
     void setLED(int index, int iR, int iG, int iB)
     {
       // set led identified by index to the RGB color passed to this function
-      if(index >=0 && index < LED_COUNT)
+      if(isValidIndex(index))
       {
         _led[index].r=iR;
         _led[index].g=iG;
@@ -158,6 +188,21 @@ class Kaimana
 
       // update the leds with new/current colors in the array
       updateALL();
+    }
+
+    void setColor(int index, int iR, int iG, int iB)
+    {
+      _color[index].r = iR;
+      _color[index].g = iG;
+      _color[index].b = iB;
+    }
+
+    void saveAllColors(void)
+    {
+      for(auto i = 0; i < LED_COUNT; i++)
+      {
+        EEPROM.put(getEEPROMAddress(i), _color[i]);
+      }
     }
 
     void updateALL(void)
