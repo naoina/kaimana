@@ -36,6 +36,7 @@ Selected button | `P` or `K` | `LEFT`, `RIGHT`, `DOWN` or `UP` | Behavior
 　 | `START` | `START` | Set color and return to selection mode
 　 | `SELECT` | `SELECT` | Reset color
 
+The range of the RGB value is from 0 to 255. if you increase RGB value over 255, it will be started from 0 again.
 After finish to set all LED colors you want, return to selection mode, then press and hold the `SELECT` button at least 3 seconds to save LED colors you set.
 
 ## Copyright
