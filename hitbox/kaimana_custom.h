@@ -33,42 +33,6 @@
 #include <avr/pgmspace.h>
 #include "Arduino.h"
 
-// Kaimana J2 RGB LED has 2 LEDs.
-#define  LED_P1_1      16
-#define  LED_P2_1      14
-#define  LED_P3_1      12
-#define  LED_P4_1      10
-#define  LED_K1_1      2
-#define  LED_K2_1      4
-#define  LED_K3_1      6
-#define  LED_K4_1      8
-#define  LED_LEFT_1    22
-#define  LED_DOWN_1    20
-#define  LED_RIGHT_1   18
-#define  LED_UP_1      0
-#define  LED_HOME_1    24
-#define  LED_GUIDE_1   26
-#define  LED_SELECT_1  28
-#define  LED_BACK_1    30
-#define  LED_START_1   32
-#define  LED_P1_2      (LED_P1_1 + 1)
-#define  LED_P2_2      (LED_P2_1 + 1)
-#define  LED_P3_2      (LED_P3_1 + 1)
-#define  LED_P4_2      (LED_P4_1 + 1)
-#define  LED_K1_2      (LED_K1_1 + 1)
-#define  LED_K2_2      (LED_K2_1 + 1)
-#define  LED_K3_2      (LED_K3_1 + 1)
-#define  LED_K4_2      (LED_K4_1 + 1)
-#define  LED_LEFT_2    (LED_LEFT_1 + 1)
-#define  LED_DOWN_2    (LED_DOWN_1 + 1)
-#define  LED_RIGHT_2   (LED_RIGHT_1 + 1)
-#define  LED_UP_2      (LED_UP_1 + 1)
-#define  LED_HOME_2    (LED_HOME_1 + 1)
-#define  LED_GUIDE_2   (LED_GUIDE_1 + 1)
-#define  LED_SELECT_2  (LED_SELECT_1 + 1)
-#define  LED_BACK_2    (LED_BACK_1 + 1)
-#define  LED_START_2   (LED_START_1 + 1)
-
 // maximum number of LEDs attached to Kaimana board
 // best to leave value untouched at 12 unless you understand why
 #define  LED_COUNT   24

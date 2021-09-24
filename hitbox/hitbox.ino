@@ -31,10 +31,12 @@
 #include "kaimana.hpp"
 #include "kaimana_custom.h"
 // local function declarations
-int  pollSwitches(void);
+void  pollSwitches(void);
 void pollSwitchesForTourneyMode(void);
 void pollSwitchesForSettingSelection(void);
 void pollSwitchesForSetting(void);
+void pollSwitchesForPinLEDSettingSelection(void);
+void pollSwitchesForPinLEDSetting(void);
 void showStartup(void);
 // ParadiseArcadeShop.com Kaimana features initialzied when Kaimana class instantiated
 Kaimana kaimana;
@@ -42,9 +44,9 @@ Kaimana kaimana;
 auto pollFunction = pollSwitchesForTourneyMode;
 int tourneyButtonHoldTime = 0;
 int settingButtonHoldTime = 0;
+int pinLEDSettingButtonHoldTime = 0;
 struct SettingLedButton {
-    int first;
-    int second;
+    int pin;
 
     SettingLedButton()
     {
@@ -53,37 +55,51 @@ struct SettingLedButton {
 
     bool isSet(void)
     {
-      return first != -1 && second != -1;
+      return pin != -1;
     }
 
     void reset(void)
     {
-      first = -1;
-      second = -1;
+      pin = -1;
     }
 
     bool isSetOnMoveSide(void)
     {
-      switch (first)
+      switch (pin)
       {
-        case LED_RIGHT_1:
-        case LED_RIGHT_2:
-        case LED_DOWN_1:
-        case LED_DOWN_2:
-        case LED_LEFT_1:
-        case LED_LEFT_2:
-        case LED_UP_1:
-        case LED_UP_2:
+        case PIN_RIGHT:
+        case PIN_DOWN:
+        case PIN_LEFT:
+        case PIN_UP:
           return true;
       }
       return false;
     }
 } settingLedButton;
 
+struct SettingPinLEDButton {
+    int pin;
+
+    SettingPinLEDButton()
+    {
+        reset();
+    }
+
+    bool isSet(void)
+    {
+      return pin != -1;
+    }
+
+    void reset(void)
+    {
+        pin = -1;
+    }
+} settingPinLEDButton;
+
 // the setup routine runs first and once each time power is applied to the Kaimana board
 void setup()
 {
-  // do nothing.
+    // Serial.begin(115200);
 }
 // the loop routine repeats indefinitely and executes immediately following the setup() function
 void loop()
@@ -107,62 +123,26 @@ void showStartup(void)
 {
   kaimana.setALL(BLACK);
   delay(BOOT_COLOR_DELAY);
-  kaimana.setLED(LED_P1_1);
-  kaimana.setLED(LED_P1_2);
-  kaimana.setLED(LED_P2_1);
-  kaimana.setLED(LED_P2_2);
-  kaimana.setLED(LED_P3_1);
-  kaimana.setLED(LED_P3_2);
-  kaimana.setLED(LED_P4_1);
-  kaimana.setLED(LED_P4_2);
-  kaimana.setLED(LED_K1_1);
-  kaimana.setLED(LED_K1_2);
-  kaimana.setLED(LED_K2_1);
-  kaimana.setLED(LED_K2_2);
-  kaimana.setLED(LED_K3_1);
-  kaimana.setLED(LED_K3_2);
-  kaimana.setLED(LED_K4_1);
-  kaimana.setLED(LED_K4_2);
-  kaimana.setLED(LED_LEFT_1);
-  kaimana.setLED(LED_LEFT_2);
-  kaimana.setLED(LED_DOWN_1);
-  kaimana.setLED(LED_DOWN_2);
-  kaimana.setLED(LED_RIGHT_1);
-  kaimana.setLED(LED_RIGHT_2);
-  kaimana.setLED(LED_UP_1);
-  kaimana.setLED(LED_UP_2);
-  kaimana.updateALL();
+  kaimana.setALL(WHITE);
   delay(BOOT_COMPLETE_DELAY);
   kaimana.setALL(BLACK);
 }
 
 void showStartupSettingMode()
 {
-  kaimana.setLED(LED_P1_1);
-  kaimana.setLED(LED_P1_2);
-  kaimana.setLED(LED_P2_1);
-  kaimana.setLED(LED_P2_2);
-  kaimana.setLED(LED_P3_1);
-  kaimana.setLED(LED_P3_2);
-  kaimana.setLED(LED_P4_1);
-  kaimana.setLED(LED_P4_2);
-  kaimana.setLED(LED_K1_1);
-  kaimana.setLED(LED_K1_2);
-  kaimana.setLED(LED_K2_1);
-  kaimana.setLED(LED_K2_2);
-  kaimana.setLED(LED_K3_1);
-  kaimana.setLED(LED_K3_2);
-  kaimana.setLED(LED_K4_1);
-  kaimana.setLED(LED_K4_2);
-  kaimana.setLED(LED_LEFT_1);
-  kaimana.setLED(LED_LEFT_2);
-  kaimana.setLED(LED_DOWN_1);
-  kaimana.setLED(LED_DOWN_2);
-  kaimana.setLED(LED_RIGHT_1);
-  kaimana.setLED(LED_RIGHT_2);
-  kaimana.setLED(LED_UP_1);
-  kaimana.setLED(LED_UP_2);
+  kaimana.setAllLEDs();
   kaimana.updateALL();
+}
+
+void showStartupPinLEDSettingMode()
+{
+    for(auto i = 0; i < 2; i++)
+    {
+        kaimana.setALL(WHITE);
+        delay(BOOT_COLOR_DELAY);
+        kaimana.setALL(BLACK);
+        delay(BOOT_COLOR_DELAY);
+    }
 }
 
 void showShutdownSettingMode()
@@ -170,313 +150,103 @@ void showShutdownSettingMode()
   kaimana.setALL(BLACK);
 }
 
-int pollSwitches(void)
+void pollSwitches(void)
 {
-  static int  iLED[LED_COUNT];
-  static int  iActiveSwitchCount;
-  static int  i;
-  static int  j;
-  static int  firsttime;
-  static uint16_t  joystickDirection;
-  static uint16_t  switchActivity;
-  // reset LED status
-  if (firsttime == 1)
-  {
-    for(i=0;i<LED_COUNT;++i)
-    {
-      iLED[i] = false;
-      firsttime = 0;
-    }
-  }
-  // clear results for switch activity
-  switchActivity = ATTACK_NONE;
   if(!digitalRead(PIN_RIGHT))
   {
-    if(!iLED[LED_RIGHT_1])
-    {
-        kaimana.setLED(LED_RIGHT_1);
-        iLED[LED_RIGHT_1] = true;
-    }
-    if(!iLED[LED_RIGHT_2])
-    {
-        kaimana.setLED(LED_RIGHT_2);
-        iLED[LED_RIGHT_2] = true;
-    }
+    kaimana.setLED(PIN_RIGHT);
   }
   else
   {
-    kaimana.setLED(LED_RIGHT_1, BLACK);
-    kaimana.setLED(LED_RIGHT_2, BLACK);
-    iLED[LED_RIGHT_1] = false;
-    iLED[LED_RIGHT_2] = false;
+    kaimana.setLED(PIN_RIGHT, BLACK);
   }
   if(!digitalRead(PIN_DOWN))
   {
-    if(!iLED[LED_DOWN_1])
-    {
-        kaimana.setLED(LED_DOWN_1);
-        iLED[LED_DOWN_1] = true;
-    }
-    if(!iLED[LED_DOWN_2])
-    {
-        kaimana.setLED(LED_DOWN_2);
-        iLED[LED_DOWN_2] = true;
-    }
+    kaimana.setLED(PIN_DOWN);
   }
   else
   {
-    kaimana.setLED(LED_DOWN_1, BLACK);
-    kaimana.setLED(LED_DOWN_2, BLACK);
-    iLED[LED_DOWN_1] = false;
-    iLED[LED_DOWN_2] = false;
+    kaimana.setLED(PIN_DOWN, BLACK);
   }
   if(!digitalRead(PIN_LEFT))
   {
-    if(!iLED[LED_LEFT_1])
-    {
-        kaimana.setLED(LED_LEFT_1);
-        iLED[LED_LEFT_1] = true;
-    }
-    if(!iLED[LED_LEFT_2])
-    {
-        kaimana.setLED(LED_LEFT_2);
-        iLED[LED_LEFT_2] = true;
-    }
+    kaimana.setLED(PIN_LEFT);
   }
   else
   {
-    kaimana.setLED(LED_LEFT_1, BLACK);
-    kaimana.setLED(LED_LEFT_2, BLACK);
-    iLED[LED_LEFT_1] = false;
-    iLED[LED_LEFT_2] = false;
+    kaimana.setLED(PIN_LEFT, BLACK);
   }
   if(!digitalRead(PIN_UP))
   {
-    if(!iLED[LED_UP_1])
-    {
-        kaimana.setLED(LED_UP_1);
-        iLED[LED_UP_1] = true;
-    }
-    if(!iLED[LED_UP_2])
-    {
-        kaimana.setLED(LED_UP_2);
-        iLED[LED_UP_2] = true;
-    }
+    kaimana.setLED(PIN_UP);
   }
   else
   {
-    kaimana.setLED(LED_UP_1, BLACK);
-    kaimana.setLED(LED_UP_2, BLACK);
-    iLED[LED_UP_1] = false;
-    iLED[LED_UP_2] = false;
+    kaimana.setLED(PIN_UP, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_P1))
   {
-    switchActivity |= ATTACK_P1;
-    // switch is active
-    if(!iLED[LED_P1_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P1_1);
-      iLED[LED_P1_1] = true;
-    }
-    if(!iLED[LED_P1_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P1_2);
-      iLED[LED_P1_2] = true;
-    }
+    kaimana.setLED(PIN_P1);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_P1_1, BLACK);
-      kaimana.setLED(LED_P1_2, BLACK);
-      iLED[LED_P1_1] = false;
-      iLED[LED_P1_2] = false;
+    kaimana.setLED(PIN_P1, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_P2))
   {
-    switchActivity |= ATTACK_P2;
-    // switch is active
-    if(!iLED[LED_P2_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P2_1);
-      iLED[LED_P2_1] = true;
-    }
-    if(!iLED[LED_P2_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P2_2);
-      iLED[LED_P2_2] = true;
-    }
+    kaimana.setLED(PIN_P2);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_P2_1, BLACK);
-      kaimana.setLED(LED_P2_2, BLACK);
-      iLED[LED_P2_1] = false;
-      iLED[LED_P2_2] = false;
+    kaimana.setLED(PIN_P2, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_P3))
   {
-    switchActivity |= ATTACK_P3;
-    // switch is active
-    if(!iLED[LED_P3_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P3_1);
-      iLED[LED_P3_1] = true;
-    }
-    if(!iLED[LED_P3_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P3_2);
-      iLED[LED_P3_2] = true;
-    }
+    kaimana.setLED(PIN_P3);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_P3_1, BLACK);
-      kaimana.setLED(LED_P3_2, BLACK);
-      iLED[LED_P3_1] = false;
-      iLED[LED_P3_2] = false;
+    kaimana.setLED(PIN_P3, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_P4))
   {
-    switchActivity |= ATTACK_P4;
-    // switch is active
-    if(!iLED[LED_P4_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P4_1);
-      iLED[LED_P4_1] = true;
-    }
-    if(!iLED[LED_P4_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_P4_2);
-      iLED[LED_P4_2] = true;
-    }
+    kaimana.setLED(PIN_P4);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_P4_1, BLACK);
-      kaimana.setLED(LED_P4_2, BLACK);
-      iLED[LED_P4_1] = false;
-      iLED[LED_P4_2] = false;
+    kaimana.setLED(PIN_P4, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_K1))
   {
-    switchActivity |= ATTACK_K1;
-    // switch is active
-    if(!iLED[LED_K1_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K1_1);
-      iLED[LED_K1_1] = true;
-    }
-    if(!iLED[LED_K1_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K1_2);
-      iLED[LED_K1_2] = true;
-    }
+    kaimana.setLED(PIN_K1);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_K1_1, BLACK);
-      kaimana.setLED(LED_K1_2, BLACK);
-      iLED[LED_K1_1] = false;
-      iLED[LED_K1_2] = false;
+    kaimana.setLED(PIN_K1, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_K2))
   {
-    switchActivity |= ATTACK_K2;
-    // switch is active
-    if(!iLED[LED_K2_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K2_1);
-      iLED[LED_K2_1] = true;
-    }
-    if(!iLED[LED_K2_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K2_2);
-      iLED[LED_K2_2] = true;
-    }
+    kaimana.setLED(PIN_K2);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_K2_1, BLACK);
-      kaimana.setLED(LED_K2_2, BLACK);
-      iLED[LED_K2_1] = false;
-      iLED[LED_K2_2] = false;
+    kaimana.setLED(PIN_K2, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_K3))
   {
-    switchActivity |= ATTACK_K3;
-    // switch is active
-    if(!iLED[LED_K3_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K3_1);
-      iLED[LED_K3_1] = true;
-    }
-    if(!iLED[LED_K3_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K3_2);
-      iLED[LED_K3_2] = true;
-    }
+    kaimana.setLED(PIN_K3);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_K3_1, BLACK);
-      kaimana.setLED(LED_K3_2, BLACK);
-      iLED[LED_K3_1] = false;
-      iLED[LED_K3_2] = false;
+    kaimana.setLED(PIN_K3, BLACK);
   }
-  // test switch and set LED based on result
   if(!digitalRead(PIN_K4))
   {
-    switchActivity |= ATTACK_K4;
-    // switch is active
-    if(!iLED[LED_K4_1])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K4_1);
-      iLED[LED_K4_1] = true;
-    }
-    if(!iLED[LED_K4_2])
-    {
-      // select new color when switch is first activated
-      kaimana.setLED(LED_K4_2);
-      iLED[LED_K4_2] = true;
-    }
+    kaimana.setLED(PIN_K4);
   }
   else
   {
-      // switch is inactive
-      kaimana.setLED(LED_K4_1, BLACK);
-      kaimana.setLED(LED_K4_2, BLACK);
-      iLED[LED_K4_1] = false;
-      iLED[LED_K4_2] = false;
+    kaimana.setLED(PIN_K4, BLACK);
   }
   if(!digitalRead(PIN_START))
   {
@@ -512,19 +282,27 @@ int pollSwitches(void)
     }
     settingButtonHoldTime = 0;
   }
-
-  // zero active switch counter (note: 4 way joystick counts as 1)
-  iActiveSwitchCount = 0;
-  // set LED color based on switch
-  for(i=0;i<LED_COUNT;++i)
+  if(!digitalRead(PIN_HOME))
   {
-    if(iLED[i] == true)
-      ++iActiveSwitchCount;
+    pinLEDSettingButtonHoldTime += MAIN_LOOP_DELAY;
+    if(pinLEDSettingButtonHoldTime >= SETTING_MODE_ENABLE_TIME)
+    {
+        showStartupPinLEDSettingMode();
+    }
   }
+  else
+  {
+    if(pinLEDSettingButtonHoldTime >= SETTING_MODE_ENABLE_TIME)
+    {
+      showStartupPinLEDSettingMode();
+      kaimana.resetAllLEDs();
+      pollFunction = pollSwitchesForPinLEDSettingSelection;
+    }
+    pinLEDSettingButtonHoldTime = 0;
+  }
+
   // update the leds with new/current colors in the array
   kaimana.updateALL();
-  // return number of active switches
-  return(iActiveSwitchCount);
 }
 
 void pollSwitchesForTourneyMode(void)
@@ -556,74 +334,62 @@ void pollSwitchesForSettingSelection(void)
 
   if(!digitalRead(PIN_RIGHT))
   {
-    settingLedButton.first = LED_RIGHT_1;
-    settingLedButton.second = LED_RIGHT_2;
+    settingLedButton.pin = PIN_RIGHT;
     return;
   }
   if(!digitalRead(PIN_DOWN))
   {
-    settingLedButton.first = LED_DOWN_1;
-    settingLedButton.second = LED_DOWN_2;
+    settingLedButton.pin = PIN_DOWN;
     return;
   }
   if(!digitalRead(PIN_LEFT))
   {
-    settingLedButton.first = LED_LEFT_1;
-    settingLedButton.second = LED_LEFT_2;
+    settingLedButton.pin = PIN_LEFT;
     return;
   }
   if(!digitalRead(PIN_UP))
   {
-    settingLedButton.first = LED_UP_1;
-    settingLedButton.second = LED_UP_2;
+    settingLedButton.pin = PIN_UP;
     return;
   }
   if(!digitalRead(PIN_P1))
   {
-    settingLedButton.first = LED_P1_1;
-    settingLedButton.second = LED_P1_2;
+    settingLedButton.pin = PIN_P1;
     return;
   }
   if(!digitalRead(PIN_P2))
   {
-    settingLedButton.first = LED_P2_1;
-    settingLedButton.second = LED_P2_2;
+    settingLedButton.pin = PIN_P2;
     return;
   }
   if(!digitalRead(PIN_P3))
   {
-    settingLedButton.first = LED_P3_1;
-    settingLedButton.second = LED_P3_2;
+    settingLedButton.pin = PIN_P3;
     return;
   }
   if(!digitalRead(PIN_P4))
   {
-    settingLedButton.first = LED_P4_1;
-    settingLedButton.second = LED_P4_2;
+    settingLedButton.pin = PIN_P4;
     return;
   }
   if(!digitalRead(PIN_K1))
   {
-    settingLedButton.first = LED_K1_1;
-    settingLedButton.second = LED_K1_2;
+    settingLedButton.pin = PIN_K1;
     return;
   }
   if(!digitalRead(PIN_K2))
   {
-    settingLedButton.first = LED_K2_1;
-    settingLedButton.second = LED_K2_2;
+    settingLedButton.pin = PIN_K2;
     return;
   }
   if(!digitalRead(PIN_K3))
   {
-    settingLedButton.first = LED_K3_1;
-    settingLedButton.second = LED_K3_2;
+    settingLedButton.pin = PIN_K3;
     return;
   }
   if(!digitalRead(PIN_K4))
   {
-    settingLedButton.first = LED_K4_1;
-    settingLedButton.second = LED_K4_2;
+    settingLedButton.pin = PIN_K4;
     return;
   }
   if(!digitalRead(PIN_SELECT))
@@ -641,19 +407,11 @@ void pollSwitchesForSettingSelection(void)
   }
   else if(settingLedButton.isSet())
   {
-    const int indexes[2] = {settingLedButton.first, settingLedButton.second};
-    RGB_t leds[2] = {
-      kaimana.getLED(indexes[0]),
-      kaimana.getLED(indexes[1]),
-    };
+    const auto led = kaimana.getLED(settingLedButton.pin).led[0];
 
     kaimana.setALL(BLACK);
+    kaimana.setLED(settingLedButton.pin, led.r, led.g, led.b);
 
-    for(auto i = 0; i < 2; i++)
-    {
-      const auto led = leds[i];
-      kaimana.setLED(indexes[i], led.r, led.g, led.b);
-    }
     pollFunction = pollSwitchesForSetting;
   }
   show = showStartupSettingMode;
@@ -688,16 +446,13 @@ void pollSwitchesForSetting(void)
     return;
   }
 
-  const int indexes[2] = {settingLedButton.first, settingLedButton.second};
+  const auto pin = settingLedButton.pin;
 
   if(pressedButton == PIN_SELECT)
   {
-    for(const auto& index: indexes)
-    {
-      kaimana.setLED(index, BLACK);
-      kaimana.setColor(index, BLACK);
-      pressedButton = -1;
-    }
+    kaimana.setLED(pin, BLACK);
+    kaimana.setColor(pin, BLACK);
+    pressedButton = -1;
     return;
   }
 
@@ -723,33 +478,26 @@ void pollSwitchesForSetting(void)
 
     switch (pressedButton)
     {
-      case PIN_P1:
-        for(const auto& index: indexes)
-        {
-          const auto led = kaimana.getLED(index);
-          const auto r = (led.r + increaseAmount) % 255;
-          kaimana.setLED(index, r, led.g, led.b);
-          kaimana.setColor(index, r, led.g, led.b);
-        }
+      case PIN_P1: {
+        const auto led = kaimana.getLED(pin).led[0];
+        const auto r = (led.r + increaseAmount) % 255;
+        kaimana.setLED(pin, r, led.g, led.b);
+        kaimana.setColor(pin, r, led.g, led.b);
         break;
-      case PIN_P2:
-        for(const auto& index: indexes)
-        {
-          const auto led = kaimana.getLED(index);
-          const auto g = (led.g + increaseAmount) % 255;
-          kaimana.setLED(index, led.r, g, led.b);
-          kaimana.setColor(index, led.r, g, led.b);
-        }
+      }
+      case PIN_P2: {
+        const auto led = kaimana.getLED(pin).led[0];
+        const auto g = (led.g + increaseAmount) % 255;
+        kaimana.setLED(pin, led.r, g, led.b);
+        kaimana.setColor(pin, led.r, g, led.b);
         break;
-      case PIN_P3:
-        for(const auto& index: indexes)
-        {
-          const auto led = kaimana.getLED(index);
-          const auto b = (led.b + increaseAmount) % 255;
-          kaimana.setLED(index, led.r, led.g, b);
-          kaimana.setColor(index, led.r, led.g, b);
-        }
-        break;
+      }
+      case PIN_P3: {
+        const auto led = kaimana.getLED(pin).led[0];
+        const auto b = (led.b + increaseAmount) % 255;
+        kaimana.setLED(pin, led.r, led.g, b);
+        kaimana.setColor(pin, led.r, led.g, b);
+      }
     }
   }
   else
@@ -774,34 +522,205 @@ void pollSwitchesForSetting(void)
 
     switch (pressedButton)
     {
-      case PIN_LEFT:
-        for(const auto& index: indexes)
-        {
-          const auto led = kaimana.getLED(index);
-          const auto r = (led.r + increaseAmount) % 255;
-          kaimana.setLED(index, r, led.g, led.b);
-          kaimana.setColor(index, r, led.g, led.b);
-        }
+      case PIN_LEFT: {
+        const auto led = kaimana.getLED(pin).led[0];
+        const auto r = (led.r + increaseAmount) % 255;
+        kaimana.setLED(pin, r, led.g, led.b);
+        kaimana.setColor(pin, r, led.g, led.b);
         break;
-      case PIN_DOWN:
-        for(const auto& index: indexes)
-        {
-          const auto led = kaimana.getLED(index);
-          const auto g = (led.g + increaseAmount) % 255;
-          kaimana.setLED(index, led.r, g, led.b);
-          kaimana.setColor(index, led.r, g, led.b);
-        }
+      }
+      case PIN_DOWN: {
+        const auto led = kaimana.getLED(pin).led[0];
+        const auto g = (led.g + increaseAmount) % 255;
+        kaimana.setLED(pin, led.r, g, led.b);
+        kaimana.setColor(pin, led.r, g, led.b);
         break;
-      case PIN_RIGHT:
-        for(const auto& index: indexes)
-        {
-          const auto led = kaimana.getLED(index);
-          const auto b = (led.b + increaseAmount) % 255;
-          kaimana.setLED(index, led.r, led.g, b);
-          kaimana.setColor(index, led.r, led.g, b);
-        }
+      }
+      case PIN_RIGHT: {
+        const auto led = kaimana.getLED(pin).led[0];
+        const auto b = (led.b + increaseAmount) % 255;
+        kaimana.setLED(pin, led.r, led.g, b);
+        kaimana.setColor(pin, led.r, led.g, b);
         break;
+      }
     }
   }
   pressedButton = -1;
+}
+
+void pollSwitchesForPinLEDSettingSelection(void)
+{
+    static auto show = showStartupSettingMode;
+
+    show();
+
+    if(!digitalRead(PIN_RIGHT))
+    {
+        settingPinLEDButton.pin = PIN_RIGHT;
+        return;
+    }
+    if(!digitalRead(PIN_DOWN))
+    {
+        settingPinLEDButton.pin = PIN_DOWN;
+        return;
+    }
+    if(!digitalRead(PIN_LEFT))
+    {
+        settingPinLEDButton.pin = PIN_LEFT;
+        return;
+    }
+    if(!digitalRead(PIN_UP))
+    {
+        settingPinLEDButton.pin = PIN_UP;
+        return;
+    }
+    if(!digitalRead(PIN_P1))
+    {
+        settingPinLEDButton.pin = PIN_P1;
+        return;
+    }
+    if(!digitalRead(PIN_P2))
+    {
+        settingPinLEDButton.pin = PIN_P2;
+        return;
+    }
+    if(!digitalRead(PIN_P3))
+    {
+        settingPinLEDButton.pin = PIN_P3;
+        return;
+    }
+    if(!digitalRead(PIN_P4))
+    {
+        settingPinLEDButton.pin = PIN_P4;
+        return;
+    }
+    if(!digitalRead(PIN_K1))
+    {
+        settingPinLEDButton.pin = PIN_K1;
+        return;
+    }
+    if(!digitalRead(PIN_K2))
+    {
+        settingPinLEDButton.pin = PIN_K2;
+        return;
+    }
+    if(!digitalRead(PIN_K3))
+    {
+        settingPinLEDButton.pin = PIN_K3;
+        return;
+    }
+    if(!digitalRead(PIN_K4))
+    {
+        settingPinLEDButton.pin = PIN_K4;
+        return;
+    }
+
+    if(!digitalRead(PIN_HOME))
+    {
+        pinLEDSettingButtonHoldTime += MAIN_LOOP_DELAY;
+        if(pinLEDSettingButtonHoldTime >= SETTING_MODE_ENABLE_TIME && pinLEDSettingButtonHoldTime <= SETTING_MODE_ENABLE_TIME + MAIN_LOOP_DELAY)
+        {
+            show = showShutdownSettingMode;
+        }
+        return;
+    }
+
+    if(pinLEDSettingButtonHoldTime >= SETTING_MODE_ENABLE_TIME)
+    {
+        kaimana.saveAllColors();
+        pollFunction = pollSwitches;
+    }
+    else if(settingPinLEDButton.isSet())
+    {
+        kaimana.setALL(BLACK);
+        kaimana.setLED(settingPinLEDButton.pin, WHITE);
+
+        pollFunction = pollSwitchesForPinLEDSetting;
+    }
+    show = showStartupSettingMode;
+    pinLEDSettingButtonHoldTime = 0;
+}
+
+void pollSwitchesForPinLEDSetting(void)
+{
+    static auto pressedButton = -1;
+
+    kaimana.updateALL();
+
+    if(!digitalRead(PIN_RIGHT))
+    {
+        pressedButton = PIN_RIGHT;
+        return;
+    }
+    if(!digitalRead(PIN_DOWN))
+    {
+        pressedButton = PIN_DOWN;
+        return;
+    }
+    if(!digitalRead(PIN_LEFT))
+    {
+        pressedButton = PIN_LEFT;
+        return;
+    }
+    if(!digitalRead(PIN_UP))
+    {
+        pressedButton = PIN_UP;
+        return;
+    }
+    if(!digitalRead(PIN_P1))
+    {
+        pressedButton = PIN_P1;
+        return;
+    }
+    if(!digitalRead(PIN_P2))
+    {
+        pressedButton = PIN_P2;
+        return;
+    }
+    if(!digitalRead(PIN_P3))
+    {
+        pressedButton = PIN_P3;
+        return;
+    }
+    if(!digitalRead(PIN_P4))
+    {
+        pressedButton = PIN_P4;
+        return;
+    }
+    if(!digitalRead(PIN_K1))
+    {
+        pressedButton = PIN_K1;
+        return;
+    }
+    if(!digitalRead(PIN_K2))
+    {
+        pressedButton = PIN_K2;
+        return;
+    }
+    if(!digitalRead(PIN_K3))
+    {
+        pressedButton = PIN_K3;
+        return;
+    }
+    if(!digitalRead(PIN_K4))
+    {
+        pressedButton = PIN_K4;
+        return;
+    }
+
+    if(pressedButton != -1)
+    {
+        const auto led1 = kaimana.getLED(settingPinLEDButton.pin);
+        const auto led2 = kaimana.getLED(pressedButton);
+        kaimana.setPinLEDMapping(settingPinLEDButton.pin, led2.index);
+        kaimana.setPinLEDMapping(pressedButton, led1.index);
+
+        kaimana.setALL(BLACK);
+        pressedButton = -1;
+        settingPinLEDButton.reset();
+        pollFunction = pollSwitchesForPinLEDSettingSelection;
+        return;
+    }
+
+    pressedButton = -1;
 }

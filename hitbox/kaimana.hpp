@@ -73,10 +73,6 @@
 #define  ATTACK_NONE    0x0000UL
 #define  ATTACK_FALSE   0xFFFFUL
 
-
-// number of switch inputs on kaimana
-#define  SWITCH_COUNT         15
-
 // if this is changed then Kaimana::switchHistoryTest must also be revised
 #define SWITCH_HISTORY_MAX  16
 
@@ -88,10 +84,16 @@ typedef struct __attribute__ ((__packed__)) {
     uint8_t b;
 } RGB_t;
 
+// Kaimana J2 RGB LED has 2 LEDs.
+typedef struct __attribute__ ((__packed__)) {
+    RGB_t   led[2];
+    uint8_t index;
+} LED_t;
+
 
 // table of switch pin numbers
-const unsigned char switchPins[SWITCH_COUNT] = { PIN_DOWN, PIN_UP, PIN_LEFT, PIN_RIGHT, PIN_HOME, PIN_SELECT, PIN_START, PIN_P1, PIN_P2, PIN_P3, PIN_P4, PIN_K1, PIN_K2, PIN_K3, PIN_K4 };
-
+constexpr unsigned char switchPins[] = { PIN_DOWN, PIN_UP, PIN_LEFT, PIN_RIGHT, PIN_P1, PIN_P2, PIN_P3, PIN_P4, PIN_K1, PIN_K2, PIN_K3, PIN_K4/*, PIN_START, PIN_SELECT, PIN_HOME*/ };
+constexpr uint8_t SWITCH_COUNT = sizeof(switchPins) / sizeof(switchPins[0]);
 
 // define the Kaimana class
 //
@@ -101,17 +103,18 @@ class Kaimana
     // declare RGB array for 15 buttons --> 12 LEDs
     // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
     RGB_t    _led[LED_COUNT];
-    RGB_t    _color[LED_COUNT];
+    LED_t    _color[SWITCH_COUNT];
+    uint8_t  _pin_color_index[PIN_LED];
     uint16_t _switchHistory[SWITCH_HISTORY_MAX];
-
-    constexpr bool isValidIndex(int index)
-    {
-      return index >= 0 && index < LED_COUNT;
-    }
 
     constexpr int getEEPROMAddress(int index)
     {
-      return index * sizeof(RGB_t);
+      return index * sizeof(LED_t);
+    }
+
+    constexpr int getPinColorIndex(const int pin)
+    {
+        return _pin_color_index[pin];
     }
 
   public:
@@ -143,66 +146,92 @@ class Kaimana
       pinMode( PIN_K3,     INPUT_PULLUP );
       pinMode( PIN_K4,     INPUT_PULLUP );
 
-      for(auto i = 0; i < LED_COUNT; i++)
+      for(auto i = 0; i < SWITCH_COUNT; i++)
       {
-          EEPROM.get(getEEPROMAddress(i), _color[i]);
+          _pin_color_index[switchPins[i]] = i;
       }
+
+      EEPROM.get(0, _color);
 
       // initialize Switch History
       switchHistoryClear();
     }
 
-    RGB_t getLED(int index)
+    LED_t getLED(int pin)
     {
-      return _led[index];
+        return _color[getPinColorIndex(pin)];
     }
 
-    void setLED(int index)
+    void setLED(int pin)
     {
-      if(isValidIndex(index))
-      {
-        _led[index] = _color[index];
-      }
+        const auto c = _color[getPinColorIndex(pin)];
+        _led[c.index] = c.led[0];
+        _led[c.index + 1] = c.led[1];
     }
 
-    void setLED(int index, int iR, int iG, int iB)
+    void setLED(int pin, int iR, int iG, int iB)
     {
-      // set led identified by index to the RGB color passed to this function
-      if(isValidIndex(index))
-      {
-        _led[index].r=iR;
-        _led[index].g=iG;
-        _led[index].b=iB;
-      }
+        const auto c = _color[getPinColorIndex(pin)];
+        _led[c.index].r=iR;
+        _led[c.index].g=iG;
+        _led[c.index].b=iB;
+        _led[c.index + 1].r=iR;
+        _led[c.index + 1].g=iG;
+        _led[c.index + 1].b=iB;
+    }
+
+    void setAllLEDs(void)
+    {
+        for(const auto pin: switchPins)
+        {
+            setLED(pin);
+        }
     }
 
     void setALL(int iR, int iG, int iB)
     {
-      int index;
-
       // set all leds in the array to the RGB color passed to this function
-      for(index=0;index<LED_COUNT;++index)
+      for(auto i = 0; i < LED_COUNT; i++)
       {
-        setLED( index, iR, iG, iB );
+          _led[i].r = iR;
+          _led[i].g = iG;
+          _led[i].b = iB;
       }
 
       // update the leds with new/current colors in the array
       updateALL();
     }
 
-    void setColor(int index, int iR, int iG, int iB)
+    void setColor(int pin, int iR, int iG, int iB)
     {
-      _color[index].r = iR;
-      _color[index].g = iG;
-      _color[index].b = iB;
+        const auto i = getPinColorIndex(pin);
+        _color[i].led[0].r = iR;
+        _color[i].led[0].g = iG;
+        _color[i].led[0].b = iB;
+        _color[i].led[1].r = iR;
+        _color[i].led[1].g = iG;
+        _color[i].led[1].b = iB;
     }
 
     void saveAllColors(void)
     {
-      for(auto i = 0; i < LED_COUNT; i++)
-      {
-        EEPROM.put(getEEPROMAddress(i), _color[i]);
-      }
+        EEPROM.put(0, _color);
+    }
+
+    void setPinLEDMapping(uint8_t pin, uint8_t index)
+    {
+        _color[getPinColorIndex(pin)].index = index;
+    }
+
+    void resetAllLEDs()
+    {
+        for(auto i = 0; i < SWITCH_COUNT; i++)
+        {
+          const auto pin = switchPins[i];
+          setColor(pin, WHITE);
+          _color[getPinColorIndex(pin)].index = i * 2;
+        }
+        setAllLEDs();
     }
 
     void updateALL(void)

@@ -13,15 +13,27 @@ Tourney mode is to off all LEDs.
 
 #### How to enable/disable Tourney mode
 
-Press and hold the `START` button at least 3 seconds, then Tourney mode is enabled/disabled and also all LEDs are turned on for about 3 seconds.
+Press and hold the `START/OPTIONS` button at least 3 seconds, then Tourney mode is enabled/disabled and also all LEDs are turned on for about 3 seconds.
 
-### LED color setting
+### LED settings
 
-You can set a light color of LED for each button.
+#### LED/button mappings
 
-#### How to set LED colors
+To enter setting mode, press and hold the `HOME/PS/XB` button at least 3 seconds when Tourney mode is disabled.
+All LEDs are turned on if it is in selection mode of mapping mode.
+To set mapping for each LED/button correctly, you need to do the following process.
 
-To enter setting mode, press and hold the `SELECT` button at least 3 seconds when Tourney mode is disabled.
+1. Press any button
+2. Press lit up button
+
+Recurse this process for all buttons until pressed button and lit up button has been matched.
+After finishing to mapped correctly, press and hold the `HOME/PS/XB` button to leave this mode.
+
+Note that all LED settings (mappings/colors) will be reset when entering this mode.
+
+#### LED colors
+
+To enter setting mode, press and hold the `SELECT/SHARE/BACK` button at least 3 seconds when Tourney mode is disabled.
 All LEDs are turned on if it is in selection mode of setting mode.
 In that state, press a button you want to set a color of LED.
 
@@ -33,11 +45,11 @@ Selected button | `P` or `K` | `LEFT`, `RIGHT`, `DOWN` or `UP` | Behavior
 　 | `LEFT` | `P1` or `K1` | Increase 15 Red color value
 　 | `DOWN` | `P2` or `K2` | Increase 15 Green color value
 　 | `RIGHT` | `P3` or `K3` | Increase 15 Blue color value
-　 | `START` | `START` | Set color and return to selection mode
-　 | `SELECT` | `SELECT` | Reset color
+　 | `START/OPTIONS` | `START/OPTIONS` | Set color and return to selection mode
+　 | `SELECT/SHARE/BACK` | `SELECT/SHARE/BACK` | Reset color
 
 The range of the RGB value is from 0 to 255. if you increase RGB value over 255, it will be started from 0 again.
-After finish to set all LED colors you want, return to selection mode, then press and hold the `SELECT` button at least 3 seconds to save LED colors you set.
+After finishing to set all LED colors you want, return to selection mode, then press and hold the `SELECT/SHARE/BACK` button at least 3 seconds to save LED colors you set.
 
 ## Copyright
 
