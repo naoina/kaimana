@@ -403,6 +403,7 @@ void pollSwitchesForSettingSelection(void)
   }
   if(settingButtonHoldTime >= SETTING_MODE_ENABLE_TIME)
   {
+    kaimana.saveAllColors();
     pollFunction = pollSwitches;
   }
   else if(settingLedButton.isSet())
@@ -440,7 +441,6 @@ void pollSwitchesForSetting(void)
   {
     pressedButton = -1;
     settingLedButton.reset();
-    kaimana.saveAllColors();
     showStartupSettingMode();
     pollFunction = pollSwitchesForSettingSelection;
     return;
