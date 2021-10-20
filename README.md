@@ -15,6 +15,11 @@ Tourney mode is to off all LEDs.
 
 Press and hold the `START/OPTIONS` button at least 3 seconds, then Tourney mode is enabled/disabled and also all LEDs are turned on for about 3 seconds.
 
+### Invert mode
+
+In Invert mode, all LEDs are on and pressing a button turns them off.
+To enable Invert mode, press and hold the `START/OPTIONS` button and `UP` at least 3 seconds in Tourney mode.
+
 ### LED settings
 
 #### LED/button mappings

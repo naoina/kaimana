@@ -42,6 +42,7 @@ void showStartup(void);
 Kaimana kaimana;
 
 auto pollFunction = pollSwitchesForTourneyMode;
+auto invert = false;
 int tourneyButtonHoldTime = 0;
 int settingButtonHoldTime = 0;
 int pinLEDSettingButtonHoldTime = 0;
@@ -168,7 +169,7 @@ void pollSwitches(void)
   };
   for(const auto pin: pins)
   {
-    if(!digitalRead(pin))
+    if(!digitalRead(pin) ^ invert)
     {
       kaimana.setLED(pin);
     }
@@ -192,6 +193,7 @@ void pollSwitches(void)
     if(tourneyButtonHoldTime >= TOURNEY_MODE_ENABLE_TIME)
     {
       pollFunction = pollSwitchesForTourneyMode;
+      kaimana.setALL(BLACK);
     }
     tourneyButtonHoldTime = 0;
   }
@@ -243,6 +245,7 @@ void pollSwitchesForTourneyMode(void)
     // Do animations a once when moves to non-tourney mode.
     if(tourneyButtonHoldTime >= TOURNEY_MODE_ENABLE_TIME && tourneyButtonHoldTime <= TOURNEY_MODE_ENABLE_TIME + MAIN_LOOP_DELAY)
     {
+      invert = !digitalRead(PIN_UP);
       showStartup();
     }
   }
