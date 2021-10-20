@@ -152,102 +152,32 @@ void showShutdownSettingMode()
 
 void pollSwitches(void)
 {
-  if(!digitalRead(PIN_RIGHT))
+  const uint8_t pins[] = {
+    PIN_RIGHT,
+    PIN_DOWN,
+    PIN_LEFT,
+    PIN_UP,
+    PIN_P1,
+    PIN_P2,
+    PIN_P3,
+    PIN_P4,
+    PIN_K1,
+    PIN_K2,
+    PIN_K3,
+    PIN_K4,
+  };
+  for(const auto pin: pins)
   {
-    kaimana.setLED(PIN_RIGHT);
+    if(!digitalRead(pin))
+    {
+      kaimana.setLED(pin);
+    }
+    else
+    {
+      kaimana.setLED(pin, BLACK);
+    }
   }
-  else
-  {
-    kaimana.setLED(PIN_RIGHT, BLACK);
-  }
-  if(!digitalRead(PIN_DOWN))
-  {
-    kaimana.setLED(PIN_DOWN);
-  }
-  else
-  {
-    kaimana.setLED(PIN_DOWN, BLACK);
-  }
-  if(!digitalRead(PIN_LEFT))
-  {
-    kaimana.setLED(PIN_LEFT);
-  }
-  else
-  {
-    kaimana.setLED(PIN_LEFT, BLACK);
-  }
-  if(!digitalRead(PIN_UP))
-  {
-    kaimana.setLED(PIN_UP);
-  }
-  else
-  {
-    kaimana.setLED(PIN_UP, BLACK);
-  }
-  if(!digitalRead(PIN_P1))
-  {
-    kaimana.setLED(PIN_P1);
-  }
-  else
-  {
-    kaimana.setLED(PIN_P1, BLACK);
-  }
-  if(!digitalRead(PIN_P2))
-  {
-    kaimana.setLED(PIN_P2);
-  }
-  else
-  {
-    kaimana.setLED(PIN_P2, BLACK);
-  }
-  if(!digitalRead(PIN_P3))
-  {
-    kaimana.setLED(PIN_P3);
-  }
-  else
-  {
-    kaimana.setLED(PIN_P3, BLACK);
-  }
-  if(!digitalRead(PIN_P4))
-  {
-    kaimana.setLED(PIN_P4);
-  }
-  else
-  {
-    kaimana.setLED(PIN_P4, BLACK);
-  }
-  if(!digitalRead(PIN_K1))
-  {
-    kaimana.setLED(PIN_K1);
-  }
-  else
-  {
-    kaimana.setLED(PIN_K1, BLACK);
-  }
-  if(!digitalRead(PIN_K2))
-  {
-    kaimana.setLED(PIN_K2);
-  }
-  else
-  {
-    kaimana.setLED(PIN_K2, BLACK);
-  }
-  if(!digitalRead(PIN_K3))
-  {
-    kaimana.setLED(PIN_K3);
-  }
-  else
-  {
-    kaimana.setLED(PIN_K3, BLACK);
-  }
-  if(!digitalRead(PIN_K4))
-  {
-    kaimana.setLED(PIN_K4);
-  }
-  else
-  {
-    kaimana.setLED(PIN_K4, BLACK);
-  }
+
   if(!digitalRead(PIN_START))
   {
     tourneyButtonHoldTime += MAIN_LOOP_DELAY;
