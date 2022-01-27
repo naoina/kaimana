@@ -2,6 +2,11 @@
 
 This is a controller for [Kaimana Mini LED Driver](https://paradisearcadeshop.com/products/paradise-kaimana-mini-led-driver-pcb) and [Kaimana J2 RGB LED](https://paradisearcadeshop.com/products/paradise-kaimana-j2-rgb-led).
 
+## Requirements
+
+- Arduino 1.8.3 and later
+  - I used this version when I wrote code and I don't have test with older versions.
+
 ## Features
 
 - Tourney mode
